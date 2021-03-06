@@ -17,7 +17,7 @@ app.use((req, res)=>{
     })
 })
 
-app.listen(port, ()=>{
+app.listen(process.env.PORT || 5000, ()=>{
     console.log(`app is listening at port ${port}`);
 })
 
