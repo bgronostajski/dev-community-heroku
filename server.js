@@ -2,47 +2,55 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const jsForce = require('jsforce');
 
-const sfConnection = new jsForce.Connection({ loginUrl : process.env.SF_ORG_URL });
+const OAuth2 = new jsForce.Connection({
+    oauth2: {
+        clientId: process.env.client_id,
+        clientSecret: process.env.client_secret,
+        redirectUri: process.env.redirect_uri,
+    }
+});
 
 const app = express();
 
 app.use(express.json());
 
 
-app.get('/vehicles-event', (req, res) => {
-
+app.get('/vehicles', authenticateToken, (req, res) => {
+    req.conn.query("SELECT Id, Name FROM Vehicle__c").then((vehicles)=>{
+        res.json(vehicles.records);
+    }).catch((err)=>{
+        res.json(err)
+    })
 })
 
-app.get('/vehicles-connect', (req, res) => {
-
+app.get('/vehicles-test', authenticateToken, (req, res) => {
+    req.conn.query("SELECT Id, Name FROM Vehicle__c").then((vehicles)=>{
+        res.json(vehicles.records);
+    }).catch((err)=>{
+        res.json(err)
+    })
 })
 
-app.get('/vehicles-rest', (req, res) => {
-    console.log(sfConnection.accessToken)
-})
-
-app.post('/login', (req, res) =>{
-    console.log(sfConnection.accessToken)
-    const userName = req.body.username;
-    const user = { name : userName};
+app.post('/logout', authenticateToken, (req, res) =>{
+    req.conn.logout((err)=>{
+        res.send(err)
+    })
 })
 
 app.post('/login-with-sf', (req, res) =>{
     const userName = req.body.username;
     const userPassword = req.body.password;
 
-    sfConnection.login(userName, userPassword).then((userInfo) => {
+    OAuth2.login(userName, userPassword).then((userInfo) => {
         res.json({
-            organizationId: userInfo.organizationId,
-            userId: userInfo.id,
-            accessToken: sfConnection.accessToken,
-            refreshToken: sfConnection.refreshToken
+            organization_id: userInfo.organizationId,
+            user_id: userInfo.id,
+            access_token: OAuth2.accessToken
         })
     }).catch((error)=>{
         console.log(error)
         res.sendStatus(403)
     })
-
 })
 
 app.use((req, res)=>{
@@ -55,13 +63,13 @@ app.use((req, res)=>{
 function authenticateToken(req, res, next) {
     const authHeader = req.headers.authorization
     const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.sendStatus(401)
-
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403)
-        req.user = user
-        next()
+    if (token == null) { return res.sendStatus(401); }
+    req.conn = new jsForce.Connection({
+        instanceUrl: process.env.instance_url,
+        accessToken: token
     })
+
+    next();
 }
 
 app.listen(process.env.PORT);
