@@ -6,7 +6,14 @@
     "review": {
       "addons": [
         "heroku-postgresql:hobby-dev"
-      ]
+      ],
+      "env": {
+        "SECRET_TOKEN": "test-secret",
+        "client_id": "3MVG91BJr_0ZDQ4srYKYnKC6PUYlOf6Itl9mI7xnVSgj8RdQ1pi_r1ZE9_r9IcTsc.aAoec.ExYOX5fDRipQ4",
+        "client_secret": "7DE588552BD163BC1B6D0A9898819C998579584F6C0AE1FC39FEFC165C023CCA",
+        "redirect_uri": "https://developer-community-dev-ed.my.salesforce.com/services/oauth2/callback",
+        "instance_url": "https://developer-community-dev-ed.my.salesforce.com"
+      }
     }
   }
 }

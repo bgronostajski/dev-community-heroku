@@ -23,18 +23,8 @@ app.get('/vehicles', authenticateToken, (req, res) => {
     })
 })
 
-app.get('/vehicles-test', authenticateToken, (req, res) => {
-    req.conn.query("SELECT Id, Name FROM Vehicle__c").then((vehicles)=>{
-        res.json(vehicles.records);
-    }).catch((err)=>{
-        res.json(err)
-    })
-})
-
 app.post('/logout', authenticateToken, (req, res) =>{
-    req.conn.logout((err)=>{
-        res.send(err)
-    })
+    req.conn.logout((err)=>{ res.send(err) });
 })
 
 app.post('/login-with-sf', (req, res) =>{
@@ -64,6 +54,7 @@ function authenticateToken(req, res, next) {
     const authHeader = req.headers.authorization
     const token = authHeader && authHeader.split(' ')[1]
     if (token == null) { return res.sendStatus(401); }
+
     req.conn = new jsForce.Connection({
         instanceUrl: process.env.instance_url,
         accessToken: token
