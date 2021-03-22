@@ -6,7 +6,8 @@ const router = express.Router();
 
 router.get('/', auth.authenticateToken, service.getListUsingPG)
 
-router.post('/', auth.authenticateToken, service.createNewVehiclePG)
+router.get('/:id', auth.authenticateToken, service.getDetailsUsingPG)
 
+router.post('/', auth.authenticateToken, service.createNewVehiclePG)
 
 module.exports = router;
