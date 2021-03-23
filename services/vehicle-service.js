@@ -33,7 +33,7 @@ exports.getListUsingPG = async function(req, res) {
 
     try{
         const queryString = `SELECT sfid, name FROM salesforce.Vehicle__c`;
-        const result = await pool.query(queryString).rows;
+        const result = (await pool.query(queryString)).rows;
         res.json(result).status(200);
     } catch (err) {
         res.status(400).json(err);
