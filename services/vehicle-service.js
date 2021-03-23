@@ -12,7 +12,7 @@ exports.getDetailsUsingAPI = function(req, res) {
 }
 
 exports.getListUsingAPI = function(req, res) {
-    req.conn.query("SELECT Id, Name FROM Vehicle__c")
+    req.conn.query("SELECT Id, Name, CreatedBy.Name FROM Vehicle__c")
         .then(vehicles => res.json(vehicles.records))
         .catch(err => res.json(err).status(400))
 }
